@@ -119,6 +119,14 @@ public class ColonyNodeView extends JPanel
 	public ColonyNodeView left;
 	public ColonyNodeView right;
 	
+	public boolean balaPresent = false;
+	
+	public boolean discovered = false;
+	public int food = 10;
+	
+	public boolean hidden;
+
+	
 	public ColonyNodeView()
 	{
 		super();
@@ -292,13 +300,14 @@ public class ColonyNodeView extends JPanel
 	 *
 	 *	use this method to reveal the contents of the node represented by this view
 	 */
+
 	
-	public boolean hidden;
 	public void showNode()
 	{
 		setVisible(true);
 		this.hidden = false;
 	}
+		
 	
 	
 	/**
@@ -395,7 +404,7 @@ public class ColonyNodeView extends JPanel
 	{
 		balaLabel.setText("B: " + numBalas);
 	}
-	
+
 	
 	/**
 	 *	display the amount of food in the node represented by this view
