@@ -91,38 +91,24 @@ public class Game {
 		}
 		
 
-		
-		
 		for(ColonyNodeView cnv : coloniesArray){
 			if(cnv.getID().equals(above)){
 				new_cnv.above = cnv;
 				cnv.below = new_cnv;
-				System.out.print("ABOVE------>"+new_cnv.above.getID()+"\n");
-
-				
 			}
 			if(cnv.getID().equals(below)){
-				System.out.print("BELOW------>"+theID+"+\n");
 				new_cnv.below = cnv;
 				cnv.above = new_cnv;
-				
-				
 			}
 			
 			if(cnv.getID().equals(left)){
-				System.out.print("LEFT------>"+theID+"+\n");
 				new_cnv.left = cnv;
 				cnv.right = new_cnv;
-				
-				
 			}
 			
 			if(cnv.getID().equals(right)){
-				System.out.print("RIGHT------>"+theID+"+\n");
 				new_cnv.right = cnv;
 				cnv.left = new_cnv;
-				
-				
 			}
 		}
 		return new_cnv;
@@ -137,9 +123,23 @@ public class Game {
 					center.showNode();
 					center.setQueen(true);
 					createAnt("Queen");
-					
+					center.setFoodAmount(center.food = 1000);
 				}
+				if((i == 10 && x == 11) || (i == 12 && x == 11) || 
+						(i == 10 && x == 12) || (i == 11 && x == 12) || (i == 12 && x == 12) || 
+						(i == 10 && x == 10) || (i == 11 && x == 10) || (i == 12 && x == 10)){
+					c.showNode();
+					c.discovered = true;
+				}
+				c.pheromone = 0;
+				c.setPheromoneLevel(0);
 			}
+		}
+	}
+	
+	public void createMultipleAnts(int howMany, String type){
+		for(int i = 0; i < howMany; i++){
+			createAnt(type);
 		}
 	}
 	
@@ -152,17 +152,20 @@ public class Game {
 	
 	public void loop(boolean gameOver){
 		setGameStats();
-		ageAnts();
 		try {
 			if (initializedGame == false){
 				this.createDefaultColonies();
 				initializedGame = true;
+				this.createMultipleAnts(10, "Soldier");
+				this.createMultipleAnts(50, "Forager");
+				this.createMultipleAnts(4, "Scout");
 			}
-			if(gameOver == false){
+			if(this.gameOver == false){
 			    Thread.sleep(1000);
 			    this.loop(gameOver);
 			}else{
 				JOptionPane.showMessageDialog(this.colony, "GAME OVER."); 
+				System.exit(0);
 			}
 		} catch(InterruptedException ex) {
 		    Thread.currentThread().interrupt();
@@ -174,14 +177,14 @@ public class Game {
 		ArrayList<Ant> deadAnts = new ArrayList<Ant>();
 		for(Ant ant : antsArray){
 			ant.age += 1;
-			if(ant.age > 100){
-				gameOver = ant.removeAnt(coloniesArray);
+			if(ant.age > 365){
+				//gameOver = ant.removeAnt(coloniesArray);
 				deadAnts.add(ant);
 			}
 		}
 		for(Ant ant : deadAnts){
 			gameOver = ant.removeAnt(coloniesArray);
-			antsArray.remove(ant.id);
+			antsArray.remove(ant);
 		}
 	}
 	
@@ -199,17 +202,14 @@ public class Game {
 					Random r = new Random();
 					int randNum = (r.nextInt(10) + 1) / 10;
 					if(randNum == 0){
-						gameOver = ant.removeAnt(coloniesArray);
+						this.gameOver = ant.removeAnt(coloniesArray);
 						deadAnts.add(ant);
-					}else if(randNum == 1){
-						gameOver = ant.removeAnt(coloniesArray);
-						deadAnts.add(bala);
 					}
 				}
 			}
 		}
 		for(Ant ant : deadAnts){
-			antsArray.remove(ant.id);
+			antsArray.remove(ant);
 		}
 	}
 	
@@ -239,42 +239,37 @@ public class Game {
 			cnv.setBalaCount(balas);
 			cnv.setForagerCount(foragers);
 			cnv.setScoutCount(scouts);
+			if(scouts < 1){
+				cnv.hideScoutIcon();
+			}
+			if(balas < 1){
+				cnv.hideBalaIcon();
+			}
+			if(soldiers < 1){
+				cnv.hideSoldierIcon();
+			}
+			if(foragers < 1){
+				cnv.hideForagerIcon();
+			}
 		}
+		
+	}
+	
+	public void removeIfNoAnts(){
 		
 	}
 	
 	public void moveAnts(){
 		for(Ant ant : antsArray){
-			int rand = (int) (Math.random() * 4);
-			if(rand == 0){
-				if(ant.cnv.above != null){
-					ant.cnv = ant.cnv.above;
-					ant.showHide(ant.cnv, ant.cnv.below);
-					System.out.print("\n.....ABOVE"+ant.cnv.getID());
-				}
-				
-			}else if(rand == 1){
-				if(ant.cnv.right != null){
-					ant.cnv = ant.cnv.right;
-					ant.showHide(ant.cnv, ant.cnv.left);
-
-					System.out.print("\n.....RIGHT"+ant.cnv.getID());
-					
-				}
-			}else if(rand == 2){
-				if(ant.cnv.below != null){
-					ant.cnv = ant.cnv.below;
-					ant.showHide(ant.cnv, ant.cnv.above);
-					System.out.print("\n.....BELOW"+ant.cnv.getID());
+			if(ant.category == "Forager"){
+				ant.moveByPhermone(center);
+			}else if(ant.category == "Soldier"){
+				if(ant.moveByAttack(antsArray, coloniesArray) == false){
+					ant.randomlyMoveAnt();
 				}
 			}else{
-				if(ant.cnv.left != null){
-					ant.cnv = ant.cnv.left;
-					ant.showHide(ant.cnv, ant.cnv.right);
-					System.out.print("\n.....LEFT");
-				}
+				ant.randomlyMoveAnt();
 			}
-			
 		}
 	}
 	
@@ -283,14 +278,39 @@ public class Game {
 		if(_time % 10 == 0){
 			days = days + 1;
 			createAnt(null);
+			decreaseAllPheromones();
+			ageAnts();
 		}
 		int rand = (int) (Math.random() * 9);
 		if(rand < 4){
 			createAnt("Bala");
 		}
 		this.ageAnts();
+		queenEatOneUnit();
 		_time = _time + 1;
 		this.gui.setTime(this.time = convertToString(_time));
+	}
+	
+	public void queenEatOneUnit(){
+		if(center != null){
+			center.setFoodAmount(center.food -= 1);
+			if(center.food < 1){
+				this.gameOver = true;
+			}
+		}
+	}
+	
+	public void decreaseAllPheromones(){
+		for(ColonyNodeView cnv : coloniesArray){
+			if(cnv.pheromone > 0){
+				if(cnv.pheromone > 9){
+					cnv.setPheromoneLevel(cnv.pheromone -= 10);
+				}else{
+					cnv.setPheromoneLevel(0);
+					cnv.pheromone = 0;
+				}
+			}
+		}
 	}
 	
 	public Ant createAnt(String category){
@@ -299,6 +319,8 @@ public class Game {
 			ant.category = "Bala";
 		}else if(category == "Queen"){
 			ant.category = "Queen";
+		}else if(category == "Soldier"){
+			ant.category = "Soldier";
 		}
 		if(ant.category == "Bala"){
 			for(ColonyNodeView node : coloniesArray){
@@ -308,6 +330,8 @@ public class Game {
 					ant.cnv = node;
 					antsArray.add(ant);
 					this.ants += 1;
+					
+					
 				}
 			}
 		}else{
@@ -317,6 +341,7 @@ public class Game {
 				center.showScoutIcon();
 			}else if(ant.category == "Forager"){
 				center.showForagerIcon();
+				ant.nodeHistory.add(center);
 			}else if(ant.category == "Soldier"){
 				center.showSoldierIcon();
 			}
@@ -325,6 +350,7 @@ public class Game {
 			antsArray.add(ant);
 			this.ants += 1;
 		}
+		System.out.print("\n???????????????????????????????"+ant.category+"\n");
 		return ant;
 	}
 	

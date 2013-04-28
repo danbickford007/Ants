@@ -2,6 +2,7 @@ package view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -122,7 +123,7 @@ public class ColonyNodeView extends JPanel
 	public boolean balaPresent = false;
 	
 	public boolean discovered = false;
-	public int food = 10;
+	public int food = 0;
 	
 	public boolean hidden;
 
@@ -149,6 +150,20 @@ public class ColonyNodeView extends JPanel
 		
 		// set size
 		setPreferredSize(new Dimension(ColonyView.NODE_SIZE, ColonyView.NODE_SIZE));
+		
+		setFood();
+	}
+	
+	public void setFood(){
+		int rand = (int) (Math.random() * 100);
+		if(rand < 25){
+			Random r = new Random();
+			int _food = r.nextInt(1000-500) + 500;
+			this.food = _food;
+			this.setFoodAmount(this.food);
+		}else{
+			this.setFoodAmount(0);
+		}
 	}
 	
 	
@@ -367,9 +382,15 @@ public class ColonyNodeView extends JPanel
 	 *
 	 *	@param	numForagers		the number of foragers
 	 */
+	public int foragers = 0;
+	public int scouts = 0;
+	public int soldiers = 0;
+	public int balas = 0;
+	
 	public void setForagerCount(int numForagers)
 	{
 		foragerLabel.setText("F: " + numForagers);
+		foragers = numForagers;
 	}
 	
 	
@@ -381,6 +402,7 @@ public class ColonyNodeView extends JPanel
 	public void setScoutCount(int numScouts)
 	{
 		scoutLabel.setText("Sc: " + numScouts);
+		scouts = numScouts;
 	}
 	
 	
@@ -392,6 +414,7 @@ public class ColonyNodeView extends JPanel
 	public void setSoldierCount(int numSoldiers)
 	{
 		soldierLabel.setText("S: " + numSoldiers);
+		soldiers = numSoldiers;
 	}
 	
 	
@@ -403,6 +426,7 @@ public class ColonyNodeView extends JPanel
 	public void setBalaCount(int numBalas)
 	{
 		balaLabel.setText("B: " + numBalas);
+		balas = numBalas;
 	}
 
 	
@@ -432,9 +456,12 @@ public class ColonyNodeView extends JPanel
 	 *
 	 *	@param	pheromone		the amount of pheromone
 	 */
+	
+	public int pheromone = 0;
+	
 	public void setPheromoneLevel(int pheromone)
 	{
-		
+		this.pheromone = pheromone;
 		pheromoneLabel.setText("Ph: " + pheromone);
 		
 		if (pheromone >= 1000)
