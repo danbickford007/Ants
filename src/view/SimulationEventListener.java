@@ -16,6 +16,8 @@ public interface SimulationEventListener extends EventListener
 	/**
 	 *	respond to a SimulationEvent
 	 */
+	
 	void simulationEventOccurred(SimulationEvent simEvent);
+	
 	
 }

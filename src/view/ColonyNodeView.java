@@ -569,4 +569,6 @@ public class ColonyNodeView extends JPanel
 	{
 		foragerIcon.setVisible(false);
 	}
+	
+	
 }

@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.ArrayList;	
 import java.util.Random;
 
 import view.ColonyNodeView;
@@ -22,7 +22,6 @@ public class Ant {
 		}else{
 			this.category = randomAnt();
 		}
-		System.out.print("\nCATEGORY WITHIN INITIALIZATION"+category+"\n");
 
 	}
 	
@@ -57,90 +56,101 @@ public class Ant {
 		return count;
 	}
 	
+	public void dropFoodOffAtCenter(ColonyNodeView center){
+		this.cnv.food += 1;
+		this.cnv.setFoodAmount(this.cnv.food);
+		this.hasFood = false;
+		if(this.cnv.foragers <= 1){
+			this.cnv.hideForagerIcon();
+		}
+		this.cnv = center;
+		this.cnv.showForagerIcon();
+		while(this.nodeHistory.size() > 0){
+			this.nodeHistory.remove(this.nodeHistory.size() - 1);
+		}
+		this.nodeHistory.add(this.cnv);
+	}
+	
+	public void pickUpFood(){
+		if(this.cnv.foragers <= 1){
+			this.cnv.hideForagerIcon();
+		}
+		if(this.cnv.pheromone < 1000){
+			this.cnv.setPheromoneLevel(this.cnv.pheromone += 10);
+		}
+		this.cnv = nodeHistory.get(this.nodeHistory.size() - 1);
+		this.nodeHistory.remove(this.nodeHistory.size() - 1);
+		this.cnv.showForagerIcon();
+	}
+	
+	public void findByHighestPheromone(){
+		int above = 0;
+		int left = 0;
+		int right = 0;
+		int bottom = 0;
+		
+		if(this.cnv.above != null && this.cnv.above.discovered == true){
+			above = this.cnv.above.pheromone;
+		}
+		if(this.cnv.right != null && this.cnv.right.discovered == true){
+			right = this.cnv.right.pheromone;
+		}
+		if(this.cnv.below != null && this.cnv.below.discovered == true){
+			bottom = this.cnv.below.pheromone;
+		}
+		if(this.cnv.left != null && this.cnv.left.discovered == true){
+			left = this.cnv.left.pheromone;
+		}
+		int highest = 0;
+		ColonyNodeView highest_cnv = null;
+		if(above > highest && this.cnv.above != this.lastNode){
+			highest = above;
+			highest_cnv = this.cnv.above;
+		}
+		if(right > highest && this.cnv.right != this.lastNode){
+			highest = right;
+			highest_cnv = this.cnv.right;
+		}
+		if(bottom > highest && this.cnv.below != this.lastNode){
+			highest = bottom;
+			highest_cnv = this.cnv.below;
+		}
+		if(left > highest && this.cnv.left != this.lastNode){
+			highest = left;
+			highest_cnv = this.cnv.left;
+		}
+		if(highest > 0){
+			if(!this.cnv.getID().equals(highest_cnv.getID()))
+			{
+				this.nodeHistory.add(this.cnv);
+			}
+			if(this.cnv.foragers <= 1){
+				this.cnv.hideForagerIcon();
+			}
+			this.lastNode = this.cnv;
+			this.cnv = highest_cnv;
+			highest_cnv.showForagerIcon();
+			this.takeFood();
+		}else{
+			this.lastNode = this.cnv;
+			ColonyNodeView old = this.cnv;
+			this.randomlyMoveAnt();
+			this.takeFood();
+			if(!old.getID().equals(this.cnv.getID())){
+				this.nodeHistory.add(this.cnv);
+			}
+		}
+		
+
+	}
+	
 	public void moveByPhermone(ColonyNodeView center){
 		if(this.cnv.getID().equals("11:11") && this.hasFood == true){
-			this.cnv.food += 1;
-			this.cnv.setFoodAmount(this.cnv.food);
-			this.hasFood = false;
-			if(this.cnv.foragers <= 1){
-				this.cnv.hideForagerIcon();
-			}
-			this.cnv = center;
-			this.cnv.showForagerIcon();
-			while(this.nodeHistory.size() > 0){
-				this.nodeHistory.remove(this.nodeHistory.size() - 1);
-			}
-			this.nodeHistory.add(this.cnv);
-			
+			dropFoodOffAtCenter(center);
 		}else if(this.nodeHistory.size() > 0 && this.hasFood == true){
-			if(this.cnv.foragers <= 1){
-				this.cnv.hideForagerIcon();
-			}
-			if(this.cnv.pheromone < 1000){
-				this.cnv.setPheromoneLevel(this.cnv.pheromone += 10);
-			}
-			this.cnv = nodeHistory.get(this.nodeHistory.size() - 1);
-			this.nodeHistory.remove(this.nodeHistory.size() - 1);
-			this.cnv.showForagerIcon();
+			pickUpFood();
 		}else{
-			int above = 0;
-			int left = 0;
-			int right = 0;
-			int bottom = 0;
-			
-			if(this.cnv.above != null && this.cnv.above.discovered == true){
-				above = this.cnv.above.pheromone;
-			}
-			if(this.cnv.right != null && this.cnv.right.discovered == true){
-				right = this.cnv.right.pheromone;
-			}
-			if(this.cnv.below != null && this.cnv.below.discovered == true){
-				bottom = this.cnv.below.pheromone;
-			}
-			if(this.cnv.left != null && this.cnv.left.discovered == true){
-				left = this.cnv.left.pheromone;
-			}
-			int highest = 0;
-			ColonyNodeView highest_cnv = null;
-			if(above > highest && this.cnv.above != this.lastNode){
-				highest = above;
-				highest_cnv = this.cnv.above;
-			}
-			if(right > highest && this.cnv.right != this.lastNode){
-				highest = right;
-				highest_cnv = this.cnv.right;
-			}
-			if(bottom > highest && this.cnv.below != this.lastNode){
-				highest = bottom;
-				highest_cnv = this.cnv.below;
-			}
-			if(left > highest && this.cnv.left != this.lastNode){
-				highest = left;
-				highest_cnv = this.cnv.left;
-			}
-			if(highest > 0){
-				if(!this.cnv.getID().equals(highest_cnv.getID()))
-				{
-					this.nodeHistory.add(this.cnv);
-				}
-				if(this.cnv.foragers <= 1){
-					this.cnv.hideForagerIcon();
-				}
-				this.lastNode = this.cnv;
-				this.cnv = highest_cnv;
-				highest_cnv.showForagerIcon();
-				this.takeFood();
-			}else{
-				this.lastNode = this.cnv;
-				ColonyNodeView old = this.cnv;
-				this.randomlyMoveAnt();
-				this.takeFood();
-				if(!old.getID().equals(this.cnv.getID())){
-					this.nodeHistory.add(this.cnv);
-				}
-			}
-			
-
+			findByHighestPheromone();
 		}
 		
 	}
@@ -195,43 +205,60 @@ public class Ant {
 	public boolean moveByAttack(ArrayList<Ant> ants, ArrayList<ColonyNodeView> colonies){
 		boolean moved = false;
 		ArrayList<Ant> balas = new ArrayList<Ant>();
+		ArrayList<Ant> deadAnts = new ArrayList<Ant>();
 		for(Ant ant : ants){
 			if(ant.category == "Bala"){
 				balas.add(ant);
 			}
 		}
 		Random r = new Random();
-		int randNum = (r.nextInt(10) + 1) / 10;
+		int randNum = (r.nextInt(20)) / 10;
 		for(Ant bala : balas){
 			if(this.cnv.above != null && bala.cnv.getID().equals(this.cnv.above.getID())){
 				if(randNum == 0){
 					this.cnv = bala.cnv;
 					bala.removeAnt(colonies);
 					this.cnv.hideBalaIcon();
+					deadAnts.add(bala);
 					moved = true;
+				}else{
+					this.cnv = this.cnv.above;
 				}
 			}else if(this.cnv.left != null && bala.cnv.getID().equals(this.cnv.left.getID())){
 				if(randNum == 0){
 					this.cnv = bala.cnv;
 					bala.removeAnt(colonies);
 					this.cnv.hideBalaIcon();
+					deadAnts.add(bala);
 					moved = true;
+				}else{
+					this.cnv = this.cnv.left;
 				}
 			}else if(this.cnv.below != null && bala.cnv.getID().equals(this.cnv.below.getID())){
 				if(randNum == 0){
 					this.cnv = bala.cnv;
 					bala.removeAnt(colonies);
 					this.cnv.hideBalaIcon();
+					deadAnts.add(bala);
 					moved = true;
+				}else{
+					this.cnv = this.cnv.below;
 				}
 			}else if(this.cnv.right != null && bala.cnv.getID().equals(this.cnv.right.getID())){
 				if(randNum == 0){
 					this.cnv = bala.cnv;
 					bala.removeAnt(colonies);
 					this.cnv.hideBalaIcon();
+					deadAnts.add(bala);
 					moved = true;
+				}else{
+					this.cnv = this.cnv.right;
 				}
 			}
+		}
+		for(Ant ant : deadAnts){
+			System.out.println("JUST KILLED BALA BY SOLDIER???????????????????"+ant.category);
+			colonies.remove(ant);
 		}
 		return moved;
 	}
@@ -241,7 +268,7 @@ public class Ant {
 			moveTo.showNode();
 			moveTo.discovered = true;
 			moveTo.showScoutIcon();
-			System.out.println("++++++++++++"+moveFrom.scouts);
+			//System.out.println("+++++++++"+moveFrom.scouts);
 			if(moveFrom.scouts <= 1){
 				moveFrom.hideScoutIcon();
 			}
@@ -341,9 +368,9 @@ public class Ant {
 		int _above = Integer.parseInt(above);
 		ColonyNodeView cnv;
 		if(topFirst == true){
-			cnv = game.orientColony(_above, _y);
+			cnv = game.presenter.orientColony(_above, _y);
 		}else{
-			cnv = game.orientColony(_x, _above);
+			cnv = game.presenter.orientColony(_x, _above);
 		}
 		return cnv;
 	}
@@ -360,8 +387,8 @@ public class Ant {
 	
 	public boolean removeAnt(ArrayList<ColonyNodeView> colonies){
 		boolean gameOver = false;
-		for(ColonyNodeView cnv : colonies){
-			if(cnv.getID().equals(this.cnv.getID())){
+		for(ColonyNodeView node : colonies){
+			if(node.getID().equals(this.cnv.getID())){
 				if(this.category == "Queen"){
 					gameOver = true;
 					System.out.println("QUEEN HAS BEEN KILLED!!!!!");
