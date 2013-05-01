@@ -8,9 +8,10 @@ import view.AntSimGUI;
 import view.ColonyNodeView;
 import view.ColonyView;
 import view.SimulationEvent;
+import view.SimulationEventListener;
 
 
-public class Game {
+public class Game implements SimulationEventListener{
 	
 	public String time = "1";
 	int ants = 0;
@@ -24,6 +25,9 @@ public class Game {
 	public ArrayList<Ant> antsArray = new ArrayList<Ant>();
 	private boolean initializedGame = false;
 	public boolean gameOver = false;
+	public SimulationEvent eventHandler;
+	public boolean step = false;
+	public boolean pressed = false;
 	
 	public ColonyNodeView center;
 	ColonyNodePresenter presenter;
@@ -32,12 +36,15 @@ public class Game {
 	{
 	      Game game = new Game();
 	      game.gui = new AntSimGUI();
+	      game.eventHandler = new SimulationEvent(game, 1);
+	      game.gui.addSimulationEventListener(game);
 	      game.colony = new ColonyView(27, 27);
 	      game.gui.initGUI(game.colony);
 	      game.presenter = new ColonyNodePresenter(game);
-	      while(game.endGame == false){
-	    	  game.loop(false);
-	      }
+	      //while(game.endGame == false){
+	    	  game.loop(false, false);
+	      //}
+	    	  
 	}
 	
 	public void createMultipleAnts(int howMany, String type){
@@ -46,25 +53,47 @@ public class Game {
 		}
 	}
 	
+	public void setUp(){
+		presenter.createDefaultColonies();
+		initializedGame = true;
+		this.createMultipleAnts(10, "Soldier");
+		this.createMultipleAnts(50, "Forager");
+		this.createMultipleAnts(4, "Scout");
+	}
 	
 	
-	public void loop(boolean gameOver){
-		SimulationEvent se = new SimulationEvent(this.colony, 0);
-		System.out.println("EVENTTTTTTTTTTTTTTTTTTTTTTT"+se.getEventType());
+	
+	public void loop(boolean gameOver, boolean initializedGame){
+		simulationEventOccurred(this.eventHandler);
 		this.gameOver = gameOver;
+		this.initializedGame = initializedGame;
 		setGameStats();
+		System.out.println("+++"+this.gameOver+"::"+initializedGame+"::"+step+"::"+pressed);
 		try {
-			if (initializedGame == false){
-				presenter.createDefaultColonies();
-				initializedGame = true;
-				this.createMultipleAnts(10, "Soldier");
-				this.createMultipleAnts(50, "Forager");
-				this.createMultipleAnts(4, "Scout");
-			}
 			if(this.gameOver == false){
-			    Thread.sleep(1000);
-			    //SimulationEvent se = new SimulationEvent(colony, 1);
-			    this.loop(this.gameOver);
+				if (this.initializedGame == true){
+					if(this.step == false){
+						Thread.sleep(1000);
+						this.loop(this.gameOver, this.initializedGame);
+					}else{
+						while(this.step == true){
+							this.pressed = false;
+							Thread.sleep(500);
+							simulationEventOccurred(this.eventHandler);
+							if(this.pressed == true || this.step == false){
+								this.loop(this.gameOver, this.initializedGame);
+							}
+						}
+					}		
+				}else{
+					while(this.initializedGame == false){
+						simulationEventOccurred(this.eventHandler);
+						if(this.initializedGame == true){
+							this.loop(this.gameOver, this.initializedGame);
+
+						}
+					}
+				}
 			}else{
 				JOptionPane.showMessageDialog(this.colony, "GAME OVER."); 
 				System.exit(0);
@@ -215,6 +244,20 @@ public class Game {
 	
 	public String convertToString(int i) {
 	    return "" + i;
+	}
+
+	@Override
+	public void simulationEventOccurred(SimulationEvent simEvent) {
+		if(simEvent.getEventType() == 6){
+			this.step = true;
+			this.pressed = true;
+		}else if(simEvent.getEventType() == 5){
+			this.step = false;
+		}else if(simEvent.getEventType() == 0){
+			this.initializedGame = true;
+			this.setUp();
+		}
+		System.out.println(this.step+"><><><><><><<>"+this.pressed+"<><><><><><><"+simEvent.getEventType());
 	}
 	
 	
