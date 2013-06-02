@@ -174,7 +174,6 @@ public class Ant {
 				this.cnv = this.cnv.above;
 				this.showHide(this.cnv, this.cnv.below);
 				this.takeFood();
-				//System.out.print("\n.....ABOVE"+this.cnv.getID());
 			}
 			
 		}else if(rand == 1){
@@ -182,7 +181,6 @@ public class Ant {
 				this.cnv = this.cnv.right;
 				this.showHide(this.cnv, this.cnv.left);
 				this.takeFood();
-				//System.out.print("\n.....RIGHT"+this.cnv.getID());
 				
 			}
 		}else if(rand == 2){
@@ -190,14 +188,12 @@ public class Ant {
 				this.cnv = this.cnv.below;
 				this.showHide(this.cnv, this.cnv.above);
 				this.takeFood();
-				//System.out.print("\n.....BELOW"+this.cnv.getID());
 			}
 		}else{
 			if(this.cnv.left != null){
 				this.cnv = this.cnv.left;
 				this.showHide(this.cnv, this.cnv.right);
 				this.takeFood();
-				//System.out.print("\n.....LEFT");
 			}
 		}
 	}
@@ -268,7 +264,6 @@ public class Ant {
 			moveTo.showNode();
 			moveTo.discovered = true;
 			moveTo.showScoutIcon();
-			//System.out.println("+++++++++"+moveFrom.scouts);
 			if(moveFrom.scouts <= 1){
 				moveFrom.hideScoutIcon();
 			}
@@ -276,34 +271,26 @@ public class Ant {
 		}else if(this.category == "Forager"){
 			if(moveTo.hidden == false){
 				moveTo.showForagerIcon();
-				//if(moveFrom.foragers <= 1){
-					moveFrom.hideForagerIcon();
-				//}
+				moveFrom.hideForagerIcon();
 				this.cnv = moveTo;
 			}else{
 				moveTo = checkAroundAntForOpenNode(moveFrom);
 				if(moveTo != null){
 					moveTo.showForagerIcon();
-					//if(moveFrom.foragers <= 1){
-						moveFrom.hideForagerIcon();
-					//}
+					moveFrom.hideForagerIcon();
 					this.cnv = moveTo;
 				}
 			}
 		}else if(this.category == "Soldier"){
 			if(moveTo.hidden == false){
 				moveTo.showSoldierIcon();
-				//if(moveFrom.soldiers <= 1){
-					moveFrom.hideSoldierIcon();
-				//}
+				moveFrom.hideSoldierIcon();
 				this.cnv = moveTo;
 			}else{
 				moveTo = checkAroundAntForOpenNode(moveFrom);
 				if(moveTo != null){
 					moveTo.showSoldierIcon();
-					//if(moveFrom.soldiers <= 1){
-						moveFrom.hideSoldierIcon();
-					//}
+					moveFrom.hideSoldierIcon();
 					this.cnv = moveTo;
 				}
 			}
@@ -311,9 +298,7 @@ public class Ant {
 				if(moveTo != null){
 					moveTo.showNode();
 					moveTo.showBalaIcon();
-					//if(moveFrom.balas <= 1){
-						moveFrom.hideBalaIcon();
-					//}
+					moveFrom.hideBalaIcon();
 					if(moveFrom.discovered == false){
 						moveFrom.hideNode();
 					}
@@ -333,8 +318,6 @@ public class Ant {
 			ant = "Scout";
 		}else if(randNum == 3){
 			ant = "Soldier";
-		}else{
-			System.out.print("! ! ! ! ! ! !! ! ! ! ! ! !OUT OF RANGE RANDOM_ANT");
 		}
 		return ant;
 	}

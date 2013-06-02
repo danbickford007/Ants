@@ -176,13 +176,10 @@ public class ColonyNodePresenter {
 				if(ant.cnv.getID().equals(bala.cnv.getID()) && ant.category != "Bala"){
 					Random r = new Random();
 					int randNum = (r.nextInt(20)) / 10;
-					System.out.println("_______________>"+randNum+":::"+ant.category);
 					if(randNum == 0){
-						System.out.println("KILLED==========="+ant.category);
 						gameOver = ant.removeAnt(coloniesArray);
 						deadAnts.add(ant);
 						if(ant.category == "Queen"){
-							System.out.println("BALA KILLED QUEEN!!!!"+ant.cnv.getID()+"::::::::::::"+gameOver);
 							ant.cnv.showBalaIcon();
 						}
 						return gameOver;

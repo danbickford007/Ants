@@ -13,7 +13,7 @@ import view.SimulationEventListener;
 
 public class Game implements SimulationEventListener{
 	
-	public String time = "1";
+	public String time = "0";
 	int ants = 0;
 	private int days = 0;
 	public boolean endGame = false;
@@ -41,10 +41,7 @@ public class Game implements SimulationEventListener{
 	      game.colony = new ColonyView(27, 27);
 	      game.gui.initGUI(game.colony);
 	      game.presenter = new ColonyNodePresenter(game);
-	      //while(game.endGame == false){
-	    	  game.loop(false, false);
-	      //}
-	    	  
+	      game.loop(false, false);
 	}
 	
 	public void createMultipleAnts(int howMany, String type){
@@ -60,8 +57,6 @@ public class Game implements SimulationEventListener{
 		this.createMultipleAnts(50, "Forager");
 		this.createMultipleAnts(4, "Scout");
 	}
-	
-	
 	
 	public void loop(boolean gameOver, boolean initializedGame){
 		simulationEventOccurred(this.eventHandler);
@@ -121,8 +116,6 @@ public class Game implements SimulationEventListener{
 	
 	public void setGameStats(){
 		this.gameOver = presenter.moveAndBattle(antsArray, coloniesArray);
-		//presenter.moveAnts();
-		//this.gameOver = presenter.battle(antsArray, coloniesArray);
 		setTime();
 		setStats();
 		
@@ -164,7 +157,7 @@ public class Game implements SimulationEventListener{
 	
 	public void setTime(){
 		int _time = Integer.parseInt(this.time);
-		if(_time % 10 == 0){
+		if(_time % 10 == 0 && this.initializedGame == true){
 			days = days + 1;
 			createAnt(null);
 			decreaseAllPheromones();
@@ -219,8 +212,6 @@ public class Game implements SimulationEventListener{
 					ant.cnv = node;
 					antsArray.add(ant);
 					this.ants += 1;
-					
-					
 				}
 			}
 		}else{
@@ -253,15 +244,10 @@ public class Game implements SimulationEventListener{
 			this.pressed = true;
 		}else if(simEvent.getEventType() == 5){
 			this.step = false;
-		}else if(simEvent.getEventType() == 0){
+		}else if(simEvent.getEventType() == 0 && this.initializedGame == false){
 			this.initializedGame = true;
 			this.setUp();
 		}
-		System.out.println(this.step+"><><><><><><<>"+this.pressed+"<><><><><><><"+simEvent.getEventType());
 	}
 	
-	
-
-
-
 }

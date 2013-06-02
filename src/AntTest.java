@@ -68,23 +68,6 @@ public class AntTest {
 		}
 		assertEquals(false, eq);
 	}
-	
-	@Test
-	public void antMovesAndAttacksBalaIfInReach() {
-		Ant ant = setNodeRelationships();
-		ColonyNodeView node = ant.cnv;
-		Ant bala = new Ant(55);
-		bala.category = "Bala";
-		bala.cnv = node.above;
-		ArrayList<Ant> ants = new ArrayList<Ant>();
-		ants.add(ant);
-		ants.add(bala);
-		ArrayList<ColonyNodeView> colonies = new ArrayList<ColonyNodeView>();
-		colonies.add(ant.cnv);
-		colonies.add(bala.cnv);
-		ant.moveByAttack(ants, colonies);
-		assertEquals(false, ants.contains(bala));
-	}
 		
 	public Ant setNodeRelationships(){
 		center.setID("11:11");
